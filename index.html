@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Record shelf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..850&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E3E7EB; --panel:#F2F4F6; --ink:#1B2430; --muted:#5A6571; --line:#C8CFD6;
+  --sticker:#E3A524; --sticker-ink:#2B1F02; --teal:#2C6E72;
+  --shadow:0 1px 0 rgba(27,36,48,.08),0 8px 20px -10px rgba(27,36,48,.45);
+  --font:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#1C232C; --panel:#242C36; --ink:#E6EAEE; --muted:#9AA5B0; --line:#36404B;
+    --sticker:#E9B23A; --teal:#73B5B8; --shadow:0 8px 20px -10px rgba(0,0,0,.7);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--paper);color:var(--ink);font:400 15px/1.45 var(--font);font-stretch:100%}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.hidden{display:none!important}
+a{color:var(--teal)}
+
+/* Setup */
+#setup{min-height:100%;display:grid;place-items:center;padding:24px}
+#setup form{width:min(420px,100%)}
+#setup h1{font-stretch:62%;font-weight:850;font-size:clamp(44px,9vw,72px);line-height:.9;margin:0 0 16px;letter-spacing:-.01em}
+#setup p{color:var(--muted);margin:0 0 24px}
+.field{display:block;margin-bottom:16px}
+.field span{display:block;font-weight:600;margin-bottom:4px}
+.field small{display:block;color:var(--muted);margin-top:4px}
+.field input{width:100%;padding:10px 12px;border:1px solid var(--line);background:var(--panel);border-radius:6px}
+.primary{background:var(--ink);color:var(--paper);border:0;border-radius:6px;padding:10px 18px;font-weight:650}
+.err{color:#B2332B;margin:0 0 16px}
+@media (prefers-color-scheme:dark){.err{color:#F08A80}}
+
+/* App shell */
+#app{display:grid;grid-template-columns:250px 1fr;grid-template-rows:auto 1fr;height:100%}
+header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:16px 24px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:14px;margin-right:auto;min-width:0}
+.brand h1{margin:0;font-stretch:62%;font-weight:850;font-size:34px;line-height:1;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sticker{flex:none;width:58px;height:58px;border-radius:50%;background:var(--sticker);color:var(--sticker-ink);display:grid;place-items:center;text-align:center;transform:rotate(-8deg);font-weight:800;font-stretch:75%;line-height:1;font-size:18px;box-shadow:inset 0 0 0 3px rgba(255,255,255,.35)}
+.sticker small{display:block;font-size:10px;font-weight:600;margin-top:1px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.search{width:min(280px,60vw);padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+select,.btn{padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:var(--panel);padding:8px 12px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.meta{color:var(--muted);font-size:13px;display:flex;gap:10px;align-items:center}
+.link{background:none;border:0;padding:0;color:var(--teal);text-decoration:underline;font-size:13px}
+
+aside{border-right:1px solid var(--line);overflow-y:auto;padding:16px 16px 40px}
+.facet{margin-bottom:22px}
+.facet h2{font-size:13px;font-weight:700;margin:0 0 6px;color:var(--muted)}
+.opt{display:flex;width:100%;justify-content:space-between;gap:8px;text-align:left;border:0;background:none;padding:4px 8px;border-radius:4px}
+.opt .n{color:var(--muted);font-variant-numeric:tabular-nums}
+.opt:hover{background:var(--panel)}
+.opt[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.opt[aria-pressed="true"] .n{color:inherit;opacity:.7}
+.more,.clear{border:0;background:none;color:var(--teal);padding:4px 8px;font-size:13px;text-decoration:underline}
+.clear{margin:0 0 12px}
+
+main{overflow-y:auto;padding:16px 24px 48px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.bar p{margin:0;color:var(--muted)}
+.filters-toggle{display:none}
+
+.grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:24px 18px}
+.card{display:block;width:100%;border:0;background:none;padding:0;text-align:left}
+.cover{display:block;aspect-ratio:1;background:var(--line);box-shadow:var(--shadow);overflow:hidden;margin-bottom:8px}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.nocover{display:grid;place-items:center;height:100%;padding:10px;text-align:center;font-stretch:62%;font-weight:800;font-size:20px;line-height:1.05;color:var(--muted)}
+.card .t{display:block;font-weight:650;line-height:1.25;overflow-wrap:anywhere}
+.card .a{display:block;color:var(--muted);font-size:14px;line-height:1.3}
+.card .y{display:block;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-weight:650;color:var(--muted);padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--panel)}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.notice{background:var(--panel);border-left:3px solid var(--sticker);padding:8px 12px;margin:0 0 16px;font-size:14px}
+.foot{margin-top:48px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;max-width:72ch}
+.foot a,.attr a{color:inherit}
+.attr{font-size:13px;color:var(--muted)}
+#setup .foot{margin-top:32px}
+.empty,.status{padding:64px 16px;text-align:center;color:var(--muted)}
+.status strong{display:block;color:var(--ink);font-size:18px;margin-bottom:6px}
+
+/* Drawer */
+.backdrop{position:fixed;inset:0;background:rgba(10,14,20,.35);opacity:0;pointer-events:none;transition:opacity .2s}
+.backdrop.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100vw);background:var(--panel);box-shadow:-10px 0 30px -10px rgba(0,0,0,.35);transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;overflow-x:hidden;padding:20px 24px 40px}
+.drawer.open{transform:none}
+.drawer .close{float:right}
+.sleeve{position:relative;width:66%;aspect-ratio:1;margin:28px 0 24px}
+.sleeve img,.sleeve .nocover{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;display:block;background:var(--line);box-shadow:var(--shadow)}
+.disc{position:absolute;inset:3%;border-radius:50%;z-index:1;
+  background:
+    radial-gradient(circle,var(--panel) 0 1.6%,var(--sticker) 1.8% 16%,#0d0d0d 16.3% 19%,transparent 19.3%),
+    repeating-radial-gradient(circle,#141414 0 2px,#222 2px 3px);
+  transition:transform .7s cubic-bezier(.2,.8,.2,1) .1s}
+.drawer.reveal .disc{transform:translateX(42%) rotate(70deg)}
+.drawer h2{font-stretch:70%;font-weight:800;font-size:30px;line-height:1.05;margin:0 0 4px}
+.drawer .by{font-size:17px;margin:0 0 18px}
+dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0 0 20px;font-size:14px}
+dt{color:var(--muted)}
+dd{margin:0}
+.notes{background:var(--paper);padding:10px 12px;border-radius:6px;margin:0 0 20px;font-size:14px}
+.tracks h3{font-size:15px;margin:0 0 6px}
+.tracks ol{list-style:none;margin:0 0 20px;padding:0;font-size:14px}
+.tracks li{display:grid;grid-template-columns:2.6em 1fr auto;gap:8px;padding:4px 0;border-bottom:1px solid var(--line)}
+.tracks li.head{display:block;font-weight:650;border:0;padding-top:12px}
+.tracks .pos,.tracks .dur{color:var(--muted);font-variant-numeric:tabular-nums}
+
+@media (max-width:800px){
+  #app{grid-template-columns:1fr}
+  header{padding:12px 16px}
+  .brand h1{font-size:28px}
+  .sticker{width:50px;height:50px;font-size:16px}
+  main{padding:12px 16px 40px}
+  .filters-toggle{display:inline-block}
+  aside{position:fixed;inset:auto 0 0 0;max-height:75vh;background:var(--panel);z-index:5;border:0;border-top:1px solid var(--line);box-shadow:0 -10px 30px -10px rgba(0,0,0,.35);transform:translateY(100%);transition:transform .25s}
+  aside.open{transform:none}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:18px 14px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<section id="setup" class="hidden">
+  <form id="setupForm">
+    <h1>Record shelf</h1>
+    <p>A nicer way to browse your Discogs collection. Your details stay in this browser.</p>
+    <p id="setupErr" class="err hidden"></p>
+    <label class="field"><span>Discogs username</span>
+      <input id="fUser" required autocomplete="username" spellcheck="false"></label>
+    <label class="field"><span>Personal access token</span>
+      <input id="fToken" type="password" autocomplete="off" spellcheck="false">
+      <small>Needed if your collection is private, and it raises the rate limit. Generate one under <a href="https://www.discogs.com/settings/developers" target="_blank" rel="noopener">Settings › Developers</a> on Discogs.</small></label>
+    <button class="primary" type="submit">Load my collection</button>
+    <p class="foot" data-notice></p>
+  </form>
+</section>
+
+<div id="app" class="hidden">
+  <header>
+    <div class="brand">
+      <div class="sticker" id="sticker"></div>
+      <h1 id="title"></h1>
+    </div>
+    <div class="controls">
+      <input class="search" id="search" type="search" placeholder="Search artist, title, label, cat#" aria-label="Search">
+      <select id="sort" aria-label="Sort">
+        <option value="added-desc">Recently added</option>
+        <option value="added-asc">Oldest added</option>
+        <option value="artist">Artist A–Z</option>
+        <option value="title">Title A–Z</option>
+        <option value="year-desc">Newest release</option>
+        <option value="year-asc">Oldest release</option>
+        <option value="rating">My rating</option>
+      </select>
+      <div class="seg" role="group" aria-label="View">
+        <button data-view="grid" aria-pressed="true">Covers</button>
+        <button data-view="list" aria-pressed="false">List</button>
+      </div>
+    </div>
+    <div class="meta"><span id="synced"></span><button class="link" id="refresh">Refresh</button><button class="link" id="signout">Sign out</button></div>
+  </header>
+  <aside id="facets" aria-label="Filters"></aside>
+  <main>
+    <div class="bar">
+      <p id="summary"></p>
+      <div>
+        <button class="btn filters-toggle" id="filtersToggle">Filters</button>
+        <button class="btn" id="pick">Pick one to play</button>
+      </div>
+    </div>
+    <p id="notice" class="notice hidden" role="status"></p>
+    <div id="results"></div>
+    <footer class="foot" id="footer"></footer>
+  </main>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Record details"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const coll = new Intl.Collator(undefined, {sensitivity:'base', numeric:true});
+const clean = n => String(n || '').replace(/\s\(\d+\)$/, '').replace(/\*$/, '');
+const store = {
+  get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k){ try { localStorage.removeItem(k); } catch {} }
+};
+
+/* Discogs requires a non-affiliation notice and "Data provided by Discogs." attribution.
+   See "Discogs Intellectual Property" in their API Terms of Use and paste their exact
+   wording into NOTICE if you want it word-for-word. */
+const NOTICE = 'This app is an independent project built on the Discogs API. It is not affiliated with, sponsored by or endorsed by Discogs. Discogs is a trademark of Zink Media, LLC.';
+const MAX_AGE = 6 * 60 * 60 * 1000; // Discogs API terms: no data more than 6 hours old
+const isStale = () => Date.now() - syncedAt > MAX_AGE;
+
+let settings = store.get('shelf:settings');
+let items = [], syncedAt = 0, openToken = 0, lastFocus = null;
+const releaseCache = new Map();
+const state = { notice:'', q:'', sort:'added-desc', view:'grid', expanded:new Set(),
+  sel:{ genre:new Set(), style:new Set(), format:new Set(), decade:new Set() } };
+
+const FACETS = [
+  {key:'genre',  label:'Genre',  get:i => i.genres},
+  {key:'style',  label:'Style',  get:i => i.styles, limit:12},
+  {key:'format', label:'Format', get:i => i.formats},
+  {key:'decade', label:'Decade', get:i => [i.decade], chrono:true},
+];
+const SORTS = {
+  'added-desc': (a,b) => b.added.localeCompare(a.added),
+  'added-asc':  (a,b) => a.added.localeCompare(b.added),
+  'artist':     (a,b) => coll.compare(a.artistSort,b.artistSort) || (a.year||9999)-(b.year||9999) || coll.compare(a.title,b.title),
+  'title':      (a,b) => coll.compare(a.title,b.title),
+  'year-desc':  (a,b) => (b.year||0)-(a.year||0),
+  'year-asc':   (a,b) => (a.year||9999)-(b.year||9999),
+  'rating':     (a,b) => b.rating-a.rating || coll.compare(a.artistSort,b.artistSort),
+};
+
+/* ---------- Discogs API ---------- */
+async function api(path, params = {}) {
+  const u = new URL('https://api.discogs.com' + path);
+  for (const [k,v] of Object.entries(params)) u.searchParams.set(k, v);
+  if (settings.token) u.searchParams.set('token', settings.token);
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const r = await fetch(u);
+    if (r.status === 429) { await sleep(5000 * (attempt + 1)); continue; }
+    if (!r.ok) throw Object.assign(new Error('HTTP ' + r.status), {status:r.status});
+    const left = Number(r.headers.get('X-Discogs-Ratelimit-Remaining'));
+    if (left && left < 4) await sleep(4000);
+    return r.json();
+  }
+  throw Object.assign(new Error('Rate limited'), {status:429});
+}
+
+function joinArtists(list) {
+  return (list || []).map((a, ix, arr) => {
+    const name = clean(a.anv || a.name);
+    if (ix === arr.length - 1) return name;
+    const j = (a.join || ',').trim();
+    return name + (j === ',' ? ', ' : ` ${j} `);
+  }).join('');
+}
+
+function normalize(r) {
+  const b = r.basic_information;
+  const fmts = b.formats || [];
+  const artist = joinArtists(b.artists) || 'Unknown artist';
+  const label = b.labels?.[0];
+  const year = b.year || null;
+  let cover = b.cover_image || '';
+  if (cover.includes('spacer.gif')) cover = '';
+  const notes = (r.notes || []).map(n => n.value).filter(Boolean).join('\n');
+  const item = {
+    iid: r.instance_id, id: b.id, title: b.title, artist,
+    artistSort: artist.replace(/^the\s+/i, ''),
+    label: label ? clean(label.name) : '', catno: label?.catno && label.catno !== 'none' ? label.catno : '',
+    year, decade: year ? Math.floor(year / 10) * 10 + 's' : 'Unknown',
+    formats: [...new Set(fmts.map(f => f.name))],
+    formatText: fmts.map(f => [(+f.qty > 1 ? f.qty + '×' : ''), f.name, ...(f.descriptions || [])].join(' ').trim()).join(' + '),
+    isVinyl: fmts.some(f => f.name === 'Vinyl'),
+    genres: b.genres || [], styles: b.styles || [],
+    cover, added: r.date_added || '', rating: r.rating || 0, notes,
+  };
+  item.hay = [item.artist, item.title, item.label, item.catno, item.year, item.notes, ...item.styles].join(' ').toLowerCase();
+  return item;
+}
+
+const cacheKey = () => 'shelf:cache:' + settings.username.toLowerCase();
+
+async function sync() {
+  showApp();
+  setStatus('Connecting to Discogs…');
+  try {
+    const all = [];
+    let page = 1, pages = 1;
+    do {
+      const d = await api(`/users/${encodeURIComponent(settings.username)}/collection/folders/0/releases`,
+        {per_page:100, page, sort:'added', sort_order:'desc'});
+      pages = d.pagination.pages || 1;
+      all.push(...d.releases);
+      setStatus(`Loading records… ${all.length} of ${d.pagination.items}`);
+      page++;
+    } while (page <= pages);
+    items = all.map(normalize);
+    syncedAt = Date.now();
+    state.notice = '';
+    store.set(cacheKey(), {at:syncedAt, items});
+    render();
+  } catch (e) {
+    let msg;
+    if (e.status === 401 || e.status === 403) msg = 'This collection is private. Add a personal access token that belongs to this account.';
+    else if (e.status === 404) msg = `Discogs has no user called “${settings.username}”. Check the spelling.`;
+    else if (e.status === 429) msg = 'Discogs is rate limiting requests. Wait a minute, then load again.';
+    else if (e instanceof TypeError) msg = 'Couldn’t reach Discogs. If you opened this file straight from disk and requests are blocked, serve the folder locally instead (for example: python3 -m http.server) and open it from there.';
+    else msg = 'Discogs returned an error (' + e.message + '). Try loading again.';
+    if (items.length) { state.notice = `${msg} Showing your saved copy from ${timeAgo(syncedAt)}.`; render(); }
+    else showSetup(msg);
+  }
+}
+
+/* ---------- Filtering ---------- */
+function filtered(except) {
+  const terms = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+  return items.filter(i => {
+    if (terms.length && !terms.every(t => i.hay.includes(t))) return false;
+    for (const f of FACETS) {
+      if (f.key === except) continue;
+      const s = state.sel[f.key];
+      if (s.size && !f.get(i).some(v => s.has(v))) return false;
+    }
+    return true;
+  });
+}
+const activeFilterCount = () => FACETS.reduce((n, f) => n + state.sel[f.key].size, 0);
+
+/* ---------- Rendering ---------- */
+function setStatus(text) {
+  $('#results').innerHTML = `<div class="status"><strong>${esc(text)}</strong>Large collections take a little while; Discogs serves 100 records per request.</div>`;
+  $('#summary').textContent = '';
+}
+
+function render() {
+  const name = settings.username;
+  $('#title').textContent = `${name}’s records`;
+  $('#sticker').innerHTML = `${items.length.toLocaleString()}<small>records</small>`;
+  $('#synced').textContent = syncedAt ? 'Synced ' + timeAgo(syncedAt) : '';
+  const note = $('#notice');
+  note.textContent = state.notice;
+  note.classList.toggle('hidden', !state.notice);
+  $('#footer').innerHTML = `<a href="https://www.discogs.com/user/${encodeURIComponent(name)}/collection" target="_blank" rel="noopener">Data provided by Discogs.</a> ${esc(NOTICE)}`;
+  renderFacets();
+  const list = filtered().sort(SORTS[state.sort]);
+  state.current = list;
+  const n = activeFilterCount();
+  $('#filtersToggle').textContent = n ? `Filters (${n})` : 'Filters';
+  $('#summary').textContent = list.length === items.length
+    ? `${items.length.toLocaleString()} records`
+    : `${list.length.toLocaleString()} of ${items.length.toLocaleString()} records`;
+  $('#pick').disabled = !list.length;
+  const res = $('#results');
+  if (!list.length) {
+    res.innerHTML = `<div class="empty"><p>No records match this search and these filters.</p><button class="btn" data-clear>Clear search and filters</button></div>`;
+    return;
+  }
+  if (state.view === 'grid') {
+    res.innerHTML = `<ul class="grid">${list.map(i => `<li><button class="card" data-iid="${i.iid}">
+      <span class="cover">${i.cover ? `<img src="${esc(i.cover)}" alt="" loading="lazy" decoding="async">` : `<span class="nocover">${esc(i.title)}</span>`}</span>
+      <span class="t">${esc(i.title)}</span><span class="a">${esc(i.artist)}</span><span class="y">${i.year || ''}</span>
+    </button></li>`).join('')}</ul>`;
+  } else {
+    res.innerHTML = `<div class="tablewrap"><table><thead><tr><th>Artist</th><th>Title</th><th>Label</th><th>Cat#</th><th>Format</th><th>Year</th><th>Added</th></tr></thead><tbody>
+      ${list.map(i => `<tr data-iid="${i.iid}" tabindex="0"><td>${esc(i.artist)}</td><td>${esc(i.title)}</td><td>${esc(i.label)}</td><td class="num">${esc(i.catno)}</td><td>${esc(i.formatText)}</td><td class="num">${i.year || ''}</td><td class="num">${fmtDate(i.added)}</td></tr>`).join('')}
+    </tbody></table></div>`;
+  }
+}
+
+function renderFacets() {
+  const sections = FACETS.map(f => {
+    const counts = new Map();
+    for (const i of filtered(f.key)) for (const v of new Set(f.get(i))) counts.set(v, (counts.get(v) || 0) + 1);
+    for (const v of state.sel[f.key]) if (!counts.has(v)) counts.set(v, 0);
+    const entries = [...counts];
+    if (!entries.length) return '';
+    if (f.chrono) entries.sort((a,b) => a[0] === 'Unknown' ? 1 : b[0] === 'Unknown' ? -1 : coll.compare(a[0], b[0]));
+    else entries.sort((a,b) => b[1] - a[1] || coll.compare(a[0], b[0]));
+    const expanded = state.expanded.has(f.key);
+    const shown = f.limit && !expanded ? entries.filter((e, ix) => ix < f.limit || state.sel[f.key].has(e[0])) : entries;
+    const more = f.limit && entries.length > f.limit
+      ? `<button class="more" data-more="${f.key}">${expanded ? 'Show fewer' : `Show all ${entries.length}`}</button>` : '';
+    return `<section class="facet"><h2>${f.label}</h2>${shown.map(([v,c]) =>
+      `<button class="opt" data-facet="${f.key}" data-value="${esc(v)}" aria-pressed="${state.sel[f.key].has(v)}"><span>${esc(v)}</span><span class="n">${c}</span></button>`
+    ).join('')}${more}</section>`;
+  }).join('');
+  $('#facets').innerHTML = (activeFilterCount() ? '<button class="clear" data-clear>Clear filters</button>' : '') + sections;
+}
+
+/* ---------- Detail drawer ---------- */
+async function openItem(iid) {
+  const i = items.find(x => String(x.iid) === String(iid));
+  if (!i) return;
+  const token = ++openToken;
+  const d = $('#drawer');
+  const stars = i.rating ? '★'.repeat(i.rating) + '☆'.repeat(5 - i.rating) : '';
+  const row = (k, v) => v ? `<dt>${k}</dt><dd>${v}</dd>` : '';
+  d.innerHTML = `
+    <button class="btn close" aria-label="Close">Close</button>
+    <div class="sleeve">
+      ${i.isVinyl ? '<div class="disc"></div>' : ''}
+      ${i.cover ? `<img src="${esc(i.cover)}" alt="Cover of ${esc(i.title)}">` : `<div class="nocover">${esc(i.title)}</div>`}
+    </div>
+    <h2>${esc(i.title)}</h2>
+    <p class="by">${esc(i.artist)}</p>
+    <dl>
+      ${row('Label', esc(i.label))}${row('Cat#', esc(i.catno))}${row('Format', esc(i.formatText))}
+      ${row('Year', i.year || '')}${row('Genre', esc(i.genres.join(', ')))}${row('Style', esc(i.styles.join(', ')))}
+      ${row('Added', fmtDate(i.added))}${row('Rating', stars)}
+    </dl>
+    ${i.notes ? `<div class="notes">${esc(i.notes).replace(/\n/g,'<br>')}</div>` : ''}
+    <div class="tracks" id="tracks"><p style="color:var(--muted)">Loading tracklist…</p></div>
+    <p class="attr"><a href="https://www.discogs.com/release/${i.id}" target="_blank" rel="noopener">Data provided by Discogs.</a> Open the link for the full release page.</p>`;
+  d.scrollTop = 0;
+  if (!d.classList.contains('open')) lastFocus = document.activeElement;
+  d.classList.add('open');
+  $('#backdrop').classList.add('show');
+  d.classList.remove('reveal');
+  void d.offsetWidth;
+  requestAnimationFrame(() => d.classList.add('reveal'));
+  d.querySelector('.close').focus();
+
+  try {
+    const rel = releaseCache.get(i.id) || await api('/releases/' + i.id);
+    releaseCache.set(i.id, rel);
+    if (token !== openToken) return;
+    const tracks = (rel.tracklist || []).filter(t => t.type_ !== 'index' || t.title);
+    $('#tracks').innerHTML = tracks.length ? `<h3>Tracklist</h3><ol>${tracks.map(t => t.type_ === 'heading'
+      ? `<li class="head">${esc(t.title)}</li>`
+      : `<li><span class="pos">${esc(t.position)}</span><span>${esc(t.title)}</span><span class="dur">${esc(t.duration)}</span></li>`).join('')}</ol>` : '';
+  } catch {
+    if (token === openToken) $('#tracks').innerHTML = '<p style="color:var(--muted)">The tracklist didn’t load. The Discogs page below has it.</p>';
+  }
+}
+function closeDrawer() {
+  openToken++;
+  $('#drawer').classList.remove('open', 'reveal');
+  $('#backdrop').classList.remove('show');
+  lastFocus?.focus?.();
+}
+
+/* ---------- Helpers ---------- */
+function fmtDate(s) {
+  if (!s) return '';
+  const d = new Date(s);
+  return isNaN(d) ? '' : d.toLocaleDateString(undefined, {year:'numeric', month:'short', day:'numeric'});
+}
+function timeAgo(t) {
+  const m = Math.round((Date.now() - t) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h} hr ago`;
+  const days = Math.round(h / 24);
+  return days === 1 ? 'yesterday' : `${days} days ago`;
+}
+function clearAll() {
+  for (const f of FACETS) state.sel[f.key].clear();
+  state.q = ''; $('#search').value = '';
+  render();
+}
+
+/* ---------- Screens ---------- */
+function showSetup(err) {
+  $('#app').classList.add('hidden');
+  $('#setup').classList.remove('hidden');
+  $('#fUser').value = settings?.username || '';
+  $('#fToken').value = settings?.token || '';
+  $('#setupErr').textContent = err || '';
+  $('#setupErr').classList.toggle('hidden', !err);
+  $('#fUser').focus();
+}
+function showApp() {
+  $('#setup').classList.add('hidden');
+  $('#app').classList.remove('hidden');
+}
+
+/* ---------- Events ---------- */
+$('#setupForm').addEventListener('submit', e => {
+  e.preventDefault();
+  settings = { username: $('#fUser').value.trim(), token: $('#fToken').value.trim() };
+  store.set('shelf:settings', settings);
+  items = [];
+  sync();
+});
+let searchTimer;
+$('#search').addEventListener('input', e => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => { state.q = e.target.value; render(); }, 120);
+});
+$('#sort').addEventListener('change', e => { state.sort = e.target.value; render(); store.set('shelf:prefs', {sort:state.sort, view:state.view}); });
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  state.view = b.dataset.view;
+  document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  store.set('shelf:prefs', {sort:state.sort, view:state.view});
+  render();
+}));
+$('#facets').addEventListener('click', e => {
+  const opt = e.target.closest('.opt');
+  if (opt) {
+    const s = state.sel[opt.dataset.facet], v = opt.dataset.value;
+    s.has(v) ? s.delete(v) : s.add(v);
+    return render();
+  }
+  const more = e.target.closest('[data-more]');
+  if (more) {
+    const k = more.dataset.more;
+    state.expanded.has(k) ? state.expanded.delete(k) : state.expanded.add(k);
+    return renderFacets();
+  }
+  if (e.target.closest('[data-clear]')) { for (const f of FACETS) state.sel[f.key].clear(); render(); }
+});
+$('#results').addEventListener('click', e => {
+  if (e.target.closest('[data-clear]')) return clearAll();
+  const hit = e.target.closest('[data-iid]');
+  if (hit) openItem(hit.dataset.iid);
+});
+$('#results').addEventListener('keydown', e => {
+  const row = e.target.closest('tr[data-iid]');
+  if (row && e.key === 'Enter') openItem(row.dataset.iid);
+});
+$('#pick').addEventListener('click', () => {
+  const list = state.current || [];
+  if (list.length) openItem(list[Math.floor(Math.random() * list.length)].iid);
+});
+$('#filtersToggle').addEventListener('click', () => $('#facets').classList.toggle('open'));
+$('#refresh').addEventListener('click', sync);
+$('#signout').addEventListener('click', () => {
+  if (!confirm('Sign out? This removes your token and saved collection from this browser.')) return;
+  store.del(cacheKey());
+  store.del('shelf:settings');
+  settings = null; items = []; syncedAt = 0; state.notice = '';
+  showSetup();
+});
+
+/* Keep data within Discogs' 6-hour limit while the app stays open or is resumed */
+function refreshIfStale() {
+  if (settings?.username && items.length && isStale() && navigator.onLine) sync();
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshIfStale(); });
+window.addEventListener('online', refreshIfStale);
+setInterval(refreshIfStale, 10 * 60 * 1000);
+$('#backdrop').addEventListener('click', closeDrawer);
+$('#drawer').addEventListener('click', e => { if (e.target.closest('.close')) closeDrawer(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if ($('#drawer').classList.contains('open')) closeDrawer();
+    else $('#facets').classList.remove('open');
+  }
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); $('#search').focus(); }
+});
+
+/* ---------- Start ---------- */
+const prefs = store.get('shelf:prefs');
+if (prefs) {
+  if (SORTS[prefs.sort]) { state.sort = prefs.sort; $('#sort').value = prefs.sort; }
+  if (prefs.view === 'list' || prefs.view === 'grid') {
+    state.view = prefs.view;
+    document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x.dataset.view === state.view));
+  }
+}
+document.querySelectorAll('[data-notice]').forEach(el => el.textContent = NOTICE);
+if (settings?.username) {
+  const cached = store.get(cacheKey());
+  if (cached?.items?.length) { items = cached.items; syncedAt = cached.at; }
+  if (items.length && !isStale()) { showApp(); render(); }
+  else if (items.length && !navigator.onLine) {
+    state.notice = `You're offline. Showing your saved copy from ${timeAgo(syncedAt)}; it will update when you're back online.`;
+    showApp(); render();
+  }
+  else sync();
+} else {
+  showSetup();
+}
+</script>
+</body>
+</html>
