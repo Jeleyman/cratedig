@@ -115,6 +115,9 @@ td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
 .drawer.reveal .disc{transform:translateX(42%) rotate(70deg)}
 .drawer h2{font-stretch:70%;font-weight:800;font-size:30px;line-height:1.05;margin:0 0 4px}
 .drawer .by{font-size:17px;margin:0 0 18px}
+.share{display:flex;gap:8px;margin:-6px 0 4px}
+.share .btn{flex:1}
+.share-msg{min-height:1.2em;margin:0 0 14px;font-size:13px;color:var(--muted)}
 dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0 0 20px;font-size:14px}
 dt{color:var(--muted)}
 dd{margin:0}
@@ -397,6 +400,67 @@ function renderFacets() {
   $('#facets').innerHTML = (activeFilterCount() ? '<button class="clear" data-clear>Clear filters</button>' : '') + sections;
 }
 
+/* ---------- Sharing ---------- */
+const caption = i => `#NowSpinning ${i.artist} - ${i.title}`;
+const coverFiles = new Map();
+
+// Download the cover as a File so the share sheet can attach the actual image.
+function coverFile(i) {
+  if (!i.cover) return Promise.resolve(null);
+  if (!coverFiles.has(i.id)) {
+    coverFiles.set(i.id, fetch(i.cover, {mode:'cors'})
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.blob(); })
+      .then(blob => {
+        const type = blob.type || 'image/jpeg';
+        const ext = (type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+        const name = `${i.artist} - ${i.title}`.replace(/[^\w\- ]+/g, '').trim().slice(0, 80) || 'cover';
+        return new File([blob], `${name}.${ext}`, {type});
+      })
+      .catch(() => { coverFiles.delete(i.id); return null; }));
+  }
+  return coverFiles.get(i.id);
+}
+
+function legacyCopy(t) {
+  const a = document.createElement('textarea');
+  a.value = t; a.setAttribute('readonly', '');
+  a.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+  document.body.appendChild(a); a.select();
+  let ok = false; try { ok = document.execCommand('copy'); } catch {}
+  a.remove(); return ok;
+}
+function copyText(t) {
+  return navigator.clipboard?.writeText
+    ? navigator.clipboard.writeText(t).then(() => true, () => legacyCopy(t))
+    : Promise.resolve(legacyCopy(t));
+}
+
+let flashTimer;
+function flash(msg) {
+  const el = $('#shareMsg'); if (!el) return;
+  el.textContent = msg;
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => { el.textContent = ''; }, 3500);
+}
+
+async function copyCaption(i) {
+  flash(await copyText(caption(i)) ? 'Caption copied.' : 'Couldn’t copy the caption here.');
+}
+
+async function shareItem(i, file) {
+  const text = caption(i);
+  copyText(text); // not awaited, so the share sheet still counts as part of the tap
+  const data = file && navigator.canShare?.({files:[file]})
+    ? {files:[file], text}
+    : {text, url:`https://www.discogs.com/release/${i.id}`};
+  try {
+    await navigator.share(data);
+    if (data.files) flash('Caption copied. Paste it into your post.');
+  } catch (e) {
+    if (e.name !== 'AbortError') flash('Sharing didn’t work here, but the caption is copied.');
+  }
+}
+
 /* ---------- Detail drawer ---------- */
 async function openItem(iid) {
   const i = items.find(x => String(x.iid) === String(iid));
@@ -413,6 +477,11 @@ async function openItem(iid) {
     </div>
     <h2>${esc(i.title)}</h2>
     <p class="by">${esc(i.artist)}</p>
+    <div class="share">
+      ${navigator.share ? '<button class="btn" data-share>Share</button>' : ''}
+      <button class="btn" data-copy>Copy caption</button>
+    </div>
+    <p class="share-msg" id="shareMsg" aria-live="polite"></p>
     <dl>
       ${row('Label', esc(i.label))}${row('Cat#', esc(i.catno))}${row('Format', esc(i.formatText))}
       ${row('Year', i.year || '')}${row('Genre', esc(i.genres.join(', ')))}${row('Style', esc(i.styles.join(', ')))}
@@ -422,6 +491,14 @@ async function openItem(iid) {
     <div class="tracks" id="tracks"><p style="color:var(--muted)">Loading tracklist…</p></div>
     <p class="attr"><a href="https://www.discogs.com/release/${i.id}" target="_blank" rel="noopener">Data provided by Discogs.</a> Open the link for the full release page.</p>`;
   d.scrollTop = 0;
+
+  // Start downloading the cover now: iPhones only open the share sheet straight after a tap,
+  // so the image has to be ready before the Share button is pressed.
+  let shareFile = null;
+  coverFile(i).then(f => { if (token === openToken) shareFile = f; });
+  d.querySelector('[data-copy]').addEventListener('click', () => copyCaption(i));
+  d.querySelector('[data-share]')?.addEventListener('click', () => shareItem(i, shareFile));
+
   if (!d.classList.contains('open')) lastFocus = document.activeElement;
   d.classList.add('open');
   $('#backdrop').classList.add('show');
