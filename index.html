@@ -6,7 +6,7 @@
 <title>Record shelf</title>
 <script>
 /* Apply the saved theme before the page draws, so it doesn't flash the standard colors first */
-try { if (JSON.parse(localStorage.getItem('shelf:theme')) === 'halloween') document.documentElement.dataset.theme = 'halloween'; } catch {}
+try { if (JSON.parse(localStorage.getItem('shelf:theme')) === 'autumn') document.documentElement.dataset.theme = 'autumn'; } catch {}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,10 +24,10 @@ try { if (JSON.parse(localStorage.getItem('shelf:theme')) === 'halloween') docum
     --sticker:#E9B23A; --teal:#73B5B8; --shadow:0 8px 20px -10px rgba(0,0,0,.7);
   }
 }
-/* Halloween theme: always dark, whatever the phone's light/dark setting */
-html[data-theme="halloween"]{
-  --paper:#16111B; --panel:#211929; --ink:#EEE6D3; --muted:#A898A6; --line:#3B2E44;
-  --sticker:#F2761B; --sticker-ink:#1E0E02; --teal:#C3A6F2;
+/* Autumn theme: walnut and leaf colors, always dark, whatever the phone's light/dark setting */
+html[data-theme="autumn"]{
+  --paper:#231812; --panel:#2F2119; --ink:#F1E3CA; --muted:#B59D84; --line:#47352A;
+  --sticker:#D9822B; --sticker-ink:#2A1405; --teal:#E3B85F;
   --shadow:0 8px 22px -10px rgba(0,0,0,.85);
   color-scheme:dark;
 }
@@ -52,14 +52,14 @@ a{color:var(--teal)}
 .primary{background:var(--ink);color:var(--paper);border:0;border-radius:6px;padding:10px 18px;font-weight:650}
 .err{color:#B2332B;margin:0 0 16px}
 @media (prefers-color-scheme:dark){.err{color:#F08A80}}
-[data-theme="halloween"] .err{color:#F08A80}
+[data-theme="autumn"] .err{color:#F29A7E}
 
 /* App shell */
 #app{display:grid;grid-template-columns:250px 1fr;grid-template-rows:auto 1fr;height:100%}
 header{position:relative;grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:16px 24px;border-bottom:1px solid var(--line)}
-/* A faint cobweb tucked behind the top-right corner of the header */
-[data-theme="halloween"] header::after{content:"";position:absolute;top:0;right:0;z-index:-1;width:120px;height:120px;pointer-events:none;opacity:.2;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpath d='M120 0L0 0M120 0L8 43M120 0L33.7 83.4M120 0L73.1 110.5M120 0L120 120M94 0Q98 4.1 95.7 9.3Q101.1 12 101.3 18.1Q107.3 18.4 109.8 23.9Q115.5 21.9 120 26M68 0Q76 8.1 71.5 18.6Q82.3 24 82.6 36.1Q94.7 36.9 99.7 47.9Q111.1 43.8 120 52M40 0Q52.4 12.5 45.3 28.7Q62 37 62.5 55.6Q81 56.7 88.7 73.6Q106.3 67.4 120 80M10 0Q27 17.2 17.3 39.4Q40.2 50.8 40.9 76.4Q66.4 78 77 101.3Q101.1 92.7 120 110' fill='none' stroke='%23EEE6D3' stroke-width='.8'/%3E%3C/svg%3E") no-repeat top right/contain}
+/* A few fallen leaves tucked behind the top-right corner of the header */
+[data-theme="autumn"] header::after{content:"";position:absolute;top:0;right:0;z-index:-1;width:140px;height:120px;pointer-events:none;opacity:.28;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 120'%3E%3Cg transform='translate(70 -6) rotate(25)'%3E%3Cpath d='M60 4C30 4 10 20 9 46c0 8 2 13 5 16 27 1 46-17 46-58z' fill='%23D9822B'/%3E%3Cpath d='M12 60Q30 38 55 10' stroke='%23231812' stroke-width='2' fill='none'/%3E%3C/g%3E%3Cg transform='translate(18 40) rotate(-35) scale(.6)'%3E%3Cpath d='M60 4C30 4 10 20 9 46c0 8 2 13 5 16 27 1 46-17 46-58z' fill='%23E3B85F'/%3E%3Cpath d='M12 60Q30 38 55 10' stroke='%23231812' stroke-width='3' fill='none'/%3E%3C/g%3E%3Cg transform='translate(96 62) rotate(80) scale(.45)'%3E%3Cpath d='M60 4C30 4 10 20 9 46c0 8 2 13 5 16 27 1 46-17 46-58z' fill='%23A8432A'/%3E%3Cpath d='M12 60Q30 38 55 10' stroke='%23231812' stroke-width='4' fill='none'/%3E%3C/g%3E%3C/svg%3E") no-repeat top right/contain}
 .brand{display:flex;align-items:center;gap:14px;margin-right:auto;min-width:0}
 .brand h1{margin:0;font-stretch:62%;font-weight:850;font-size:34px;line-height:1;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sticker{flex:none;width:58px;height:58px;border-radius:50%;background:var(--sticker);color:var(--sticker-ink);display:grid;place-items:center;text-align:center;transform:rotate(-8deg);font-weight:800;font-stretch:75%;line-height:1;font-size:18px;box-shadow:inset 0 0 0 3px rgba(255,255,255,.35)}
@@ -73,15 +73,15 @@ select,.btn{padding:8px 12px;border:1px solid var(--line);border-radius:6px;back
 .meta{color:var(--muted);font-size:13px;display:flex;gap:10px;align-items:center}
 .link{background:none;border:0;padding:0;color:var(--teal);text-decoration:underline;font-size:13px}
 
-/* Theme toggle: a pumpkin that lights up when Halloween mode is on */
+/* Theme toggle: a leaf that fills in when Autumn mode is on */
 .theme-toggle{flex:none;display:grid;place-items:center;width:34px;height:34px;padding:0;border:1px solid var(--line);border-radius:50%;background:var(--panel);color:var(--muted);transition:color .2s,border-color .2s}
 .theme-toggle:hover{color:var(--ink)}
 .theme-toggle svg{width:20px;height:20px;display:block;overflow:visible}
 .theme-toggle svg *{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
-.theme-toggle .face{stroke-width:1.1}
+.theme-toggle .vein{stroke-width:1.1}
 .theme-toggle[aria-pressed="true"]{color:var(--sticker);border-color:var(--sticker)}
-.theme-toggle[aria-pressed="true"] .pumpkin{fill:var(--sticker)}
-.theme-toggle[aria-pressed="true"] .face{fill:var(--paper);stroke:var(--paper)}
+.theme-toggle[aria-pressed="true"] .leaf{fill:var(--sticker)}
+.theme-toggle[aria-pressed="true"] .vein{stroke:var(--paper)}
 
 aside{border-right:1px solid var(--line);overflow-y:auto;padding:16px 16px 40px}
 .facet{margin-bottom:22px}
@@ -153,6 +153,24 @@ dd{margin:0}
 .tracks li.head{display:block;font-weight:650;border:0;padding-top:12px}
 .tracks .pos,.tracks .dur{color:var(--muted);font-variant-numeric:tabular-nums}
 
+/* My X albums */
+.drawer.mx{width:min(540px,100vw)}
+.drawer.mx h2{margin-top:6px}
+.mx-intro{color:var(--muted);margin:0 0 18px;font-size:14px}
+.mx-row{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;margin:0 0 16px}
+.mx-row > span{font-weight:600;font-size:14px}
+.mx-row select,.mx-row input{width:100%;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+.mx-count{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.mx-count button{flex:1;border:0;border-left:1px solid var(--line);background:var(--paper);padding:7px 0;font-variant-numeric:tabular-nums;font-weight:600}
+.mx-count button:first-child{border-left:0}
+.mx-count button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.mx-count button:disabled{opacity:.3;cursor:default}
+.mx-preview{display:block;width:100%;height:auto;aspect-ratio:4/5;background:#3a2517;box-shadow:var(--shadow);margin:4px 0 14px}
+.mx-actions{display:flex;gap:8px;margin:0 0 4px}
+.mx-actions .btn{flex:1}
+.mx-actions .go{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:650}
+.mx-text{margin-top:10px}
+
 @media (max-width:800px){
   #app{grid-template-columns:1fr}
   header{padding:12px 16px}
@@ -163,7 +181,7 @@ dd{margin:0}
   aside{position:fixed;inset:auto 0 0 0;max-height:75vh;background:var(--panel);z-index:5;border:0;border-top:1px solid var(--line);box-shadow:0 -10px 30px -10px rgba(0,0,0,.35);transform:translateY(100%);transition:transform .25s}
   aside.open{transform:none}
   .grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:18px 14px}
-  [data-theme="halloween"] header::after{width:90px;height:90px}
+  [data-theme="autumn"] header::after{width:105px;height:90px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -208,11 +226,11 @@ dd{margin:0}
       </div>
     </div>
     <div class="meta"><span id="synced"></span><button class="link" id="refresh">Refresh</button><button class="link" id="signout">Sign out</button>
-      <button class="theme-toggle" id="themeToggle" aria-pressed="false" aria-label="Halloween theme" title="Switch to Halloween theme">
+      <button class="theme-toggle" id="themeToggle" aria-pressed="false" aria-label="Autumn theme" title="Switch to Autumn theme">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 6.6c.1-1.7.8-3 2.3-3.7"/>
-          <path class="pumpkin" d="M12 6.6c-1.3-.9-3.3-1-4.7-.4C4.5 7.2 3 9.8 3 13.2c0 4.1 2.7 7.3 6.1 7.3 1 0 2-.3 2.9-.8.9.5 1.9.8 2.9.8 3.4 0 6.1-3.2 6.1-7.3 0-3.4-1.5-6-4.3-7-1.4-.6-3.4-.5-4.7.4z"/>
-          <path class="face" d="M7.6 11.6l1.7-2.3 1.6 2.3zM13.1 11.6l1.6-2.3 1.7 2.3zM7.4 14.4c2.7 2.9 6.5 2.9 9.2 0l-1.6.5-1.2 1-1.3-.9-1.1.9-1.2-.9-1.3.9-1.2-1z"/>
+          <path class="leaf" d="M20 4C11.6 4 5.6 8.1 5.3 15c-.1 2 .4 3.4 1.1 4.3C13.3 19.6 19.6 14.5 20 4z"/>
+          <path d="M3.6 20.9l3.2-3.2C10.2 14 13.6 10.3 17 7.2"/>
+          <path class="vein" d="M9.8 14.6l-.4-3.2M12.7 11.7l-.2-2.9M9.8 14.6l3.3.2M12.7 11.7l3 .2"/>
         </svg>
       </button>
     </div>
@@ -224,6 +242,7 @@ dd{margin:0}
       <div>
         <button class="btn filters-toggle" id="filtersToggle">Filters</button>
         <button class="btn" id="pick">Pick one to play</button>
+        <button class="btn" id="myx">My X albums</button>
       </div>
     </div>
     <p id="notice" class="notice hidden" role="status"></p>
@@ -397,6 +416,7 @@ function render() {
     ? `${items.length.toLocaleString()} records`
     : `${list.length.toLocaleString()} of ${items.length.toLocaleString()} records`;
   $('#pick').disabled = !list.length;
+  $('#myx').disabled = !items.length;
   const res = $('#results');
   if (!list.length) {
     res.innerHTML = `<div class="empty"><p>No records match this search and these filters.</p><button class="btn" data-clear>Clear search and filters</button></div>`;
@@ -470,11 +490,11 @@ function copyText(t) {
 }
 
 let flashTimer;
-function flash(msg) {
+function flash(msg, sticky) {
   const el = $('#shareMsg'); if (!el) return;
   el.textContent = msg;
   clearTimeout(flashTimer);
-  flashTimer = setTimeout(() => { el.textContent = ''; }, 3500);
+  if (!sticky) flashTimer = setTimeout(() => { el.textContent = ''; }, 3500);
 }
 
 async function copyCaption(i) {
@@ -501,6 +521,8 @@ async function openItem(iid) {
   if (!i) return;
   const token = ++openToken;
   const d = $('#drawer');
+  d.classList.remove('mx');
+  d.setAttribute('aria-label', 'Record details');
   const stars = i.rating ? '★'.repeat(i.rating) + '☆'.repeat(5 - i.rating) : '';
   const row = (k, v) => v ? `<dt>${k}</dt><dd>${v}</dd>` : '';
   d.innerHTML = `
@@ -560,17 +582,330 @@ function closeDrawer() {
   lastFocus?.focus?.();
 }
 
+/* ---------- My X albums ---------- */
+// A shareable 1080×1350 image (Instagram's 4:5 portrait) of up to nine random records.
+const PW = 1080, PH = 1350;
+const mx = { n:9, filter:'all', handle:'', subtitle:'', order:[] };
+{ const saved = store.get('shelf:myx') || {};
+  mx.n = Math.min(9, Math.max(1, +saved.n || 9));
+  mx.filter = typeof saved.filter === 'string' ? saved.filter : 'all';
+  mx.handle = typeof saved.handle === 'string' ? saved.handle : ''; }
+let posterToken = 0, posterFile = null, posterSafe = false;
+const coverImgs = new Map();
+const pad2 = n => String(n).padStart(2, '0');
+const saveMx = () => store.set('shelf:myx', {n:mx.n, filter:mx.filter, handle:mx.handle});
+
+function mxFilters() {
+  const groups = [['genre', 'Genres', i => i.genres], ['style', 'Styles', i => i.styles], ['decade', 'Decades', i => [i.decade]]];
+  return groups.map(([key, label, get]) => {
+    const counts = new Map();
+    for (const i of items) for (const v of new Set(get(i))) if (v !== 'Unknown') counts.set(v, (counts.get(v) || 0) + 1);
+    const entries = [...counts];
+    key === 'decade' ? entries.sort((a,b) => coll.compare(a[0], b[0])) : entries.sort((a,b) => b[1] - a[1] || coll.compare(a[0], b[0]));
+    return {key, label, entries};
+  });
+}
+function mxPool() {
+  const [key, ...rest] = mx.filter.split(':'); const v = rest.join(':');
+  const get = {genre:i => i.genres, style:i => i.styles, decade:i => [i.decade]}[key];
+  const seen = new Set();
+  return items.filter(i => (!get || get(i).includes(v)) && !seen.has(i.id) && seen.add(i.id));
+}
+function mxFilterName() {
+  if (mx.filter === 'all') return '';
+  return mx.filter.split(':').slice(1).join(':');
+}
+function mxShuffle() {
+  const pool = mxPool();
+  for (let k = pool.length - 1; k > 0; k--) { const r = Math.floor(Math.random() * (k + 1)); [pool[k], pool[r]] = [pool[r], pool[k]]; }
+  // Records with a cover go first, so blank squares only appear when there's nothing else to pick
+  mx.order = [...pool.filter(i => i.cover), ...pool.filter(i => !i.cover)];
+}
+const mxPicks = () => mx.order.slice(0, Math.min(mx.n, mx.order.length));
+const mxDefaultSubtitle = () => mxFilterName() ? `Pulled at random from my ${mxFilterName()} records` : 'Pulled at random from my record shelf';
+
+function openMyX() {
+  openToken++;
+  const d = $('#drawer');
+  // Start from the sidebar filter when exactly one genre, style or decade is picked
+  for (const k of ['genre', 'style', 'decade']) if (state.sel[k].size === 1) { mx.filter = `${k}:${[...state.sel[k]][0]}`; break; }
+  const groups = mxFilters();
+  const valid = new Set(['all', ...groups.flatMap(g => g.entries.map(([v]) => `${g.key}:${v}`))]);
+  if (!valid.has(mx.filter)) mx.filter = 'all';
+  const uniq = new Set(items.map(i => i.id)).size;
+  d.classList.add('mx');
+  d.setAttribute('aria-label', 'My X albums');
+  d.innerHTML = `
+    <button class="btn close" aria-label="Close">Close</button>
+    <h2>My X albums</h2>
+    <p class="mx-intro">Pick how many and which records to draw from. Shuffle until you like the mix, then share the image.</p>
+    <div class="mx-row">
+      <span id="mxCountLabel">How many</span>
+      <div class="mx-count" role="group" aria-labelledby="mxCountLabel">${[1,2,3,4,5,6,7,8,9].map(n => `<button data-n="${n}">${n}</button>`).join('')}</div>
+      <label for="mxFilter">From</label>
+      <select id="mxFilter">
+        <option value="all">All records (${uniq})</option>
+        ${groups.filter(g => g.entries.length).map(g => `<optgroup label="${g.label}">${g.entries.map(([v,c]) =>
+          `<option value="${esc(g.key + ':' + v)}">${esc(v)} (${c})</option>`).join('')}</optgroup>`).join('')}
+      </select>
+    </div>
+    <canvas class="mx-preview" id="mxCanvas" width="${PW}" height="${PH}" role="img" aria-label="Preview of the image"></canvas>
+    <div class="mx-actions">
+      <button class="btn" data-shuffle>Shuffle</button>
+      ${navigator.share ? '<button class="btn go" data-share>Share image</button>' : ''}
+      <button class="btn${navigator.share ? '' : ' go'}" data-download>Download</button>
+    </div>
+    <p class="share-msg" id="shareMsg" aria-live="polite"></p>
+    <div class="mx-row mx-text">
+      <label for="mxSub">Subtitle</label>
+      <input id="mxSub" maxlength="70" placeholder="${esc(mxDefaultSubtitle())}" value="${esc(mx.subtitle)}">
+      <label for="mxHandle">Your handle</label>
+      <input id="mxHandle" maxlength="30" placeholder="@yourname" spellcheck="false" autocapitalize="off" value="${esc(mx.handle)}">
+    </div>`;
+  d.querySelector('#mxFilter').value = mx.filter;
+  mxShuffle();
+  mxSyncCount();
+  drawPoster();
+
+  if (!d.classList.contains('open')) lastFocus = document.activeElement;
+  d.scrollTop = 0;
+  d.classList.add('open');
+  d.classList.remove('reveal');
+  $('#backdrop').classList.add('show');
+  d.querySelector('.close').focus();
+}
+
+function mxSyncCount() {
+  const max = Math.min(9, mx.order.length);
+  $('#drawer').querySelectorAll('[data-n]').forEach(b => {
+    const n = +b.dataset.n;
+    b.disabled = n > max;
+    b.setAttribute('aria-pressed', n === Math.min(mx.n, max));
+  });
+}
+
+let textTimer;
+$('#drawer').addEventListener('click', e => {
+  if (!$('#drawer').classList.contains('mx')) return;
+  const nb = e.target.closest('[data-n]');
+  if (nb && !nb.disabled) { mx.n = +nb.dataset.n; saveMx(); mxSyncCount(); drawPoster(); }
+  if (e.target.closest('[data-shuffle]')) { mxShuffle(); drawPoster(); }
+  if (e.target.closest('[data-share]')) sharePoster();
+  if (e.target.closest('[data-download]')) downloadPoster();
+});
+$('#drawer').addEventListener('change', e => {
+  if (e.target.id !== 'mxFilter') return;
+  mx.filter = e.target.value; saveMx();
+  $('#mxSub').placeholder = mxDefaultSubtitle();
+  mxShuffle(); mxSyncCount(); drawPoster();
+});
+$('#drawer').addEventListener('input', e => {
+  if (e.target.id === 'mxSub') mx.subtitle = e.target.value;
+  else if (e.target.id === 'mxHandle') { mx.handle = e.target.value.trim(); saveMx(); }
+  else return;
+  clearTimeout(textTimer);
+  textTimer = setTimeout(drawPoster, 150);
+});
+
+// Covers are downloaded the same way Share does it, so the finished image can be exported.
+// If Discogs won't allow that, the cover is still shown, but the image can't be saved.
+function loadCover(i) {
+  if (!i.cover) return Promise.resolve(null);
+  if (!coverImgs.has(i.id)) {
+    const asImg = (src, safe) => new Promise(res => {
+      const img = new Image();
+      img.onload = () => res({img, safe});
+      img.onerror = () => res(null);
+      img.src = src;
+    });
+    coverImgs.set(i.id, coverFile(i).then(f => f ? asImg(URL.createObjectURL(f), true) : asImg(i.cover, false)));
+  }
+  return coverImgs.get(i.id);
+}
+
+function fit(ctx, text, max) {
+  text = String(text || '');
+  if (ctx.measureText(text).width <= max) return text;
+  while (text.length > 1 && ctx.measureText(text + '…').width > max) text = text.slice(0, -1);
+  return text.trimEnd() + '…';
+}
+const font = (weight, size, stretch = 'normal') => `${weight} ${stretch} ${size}px Archivo, system-ui, sans-serif`;
+
+// Seeded so the wood grain stays put when the records are shuffled
+function seeded(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+let woodCanvas;
+function wood() {
+  if (woodCanvas) return woodCanvas;
+  const c = woodCanvas = document.createElement('canvas');
+  c.width = PW; c.height = PH;
+  const g = c.getContext('2d'), rnd = seeded(7);
+  const base = g.createLinearGradient(0, 0, 0, PH);
+  base.addColorStop(0, '#5a3923'); base.addColorStop(.45, '#4a2e1b'); base.addColorStop(1, '#2f1c10');
+  g.fillStyle = base; g.fillRect(0, 0, PW, PH);
+  // Grain: long, slightly wavy vertical strokes
+  for (let x = -20; x < PW + 20; x += 2 + rnd() * 7) {
+    const dark = rnd() > .3;
+    g.strokeStyle = dark ? `rgba(24,11,4,${.12 + rnd() * .3})` : `rgba(255,214,170,${.03 + rnd() * .06})`;
+    g.lineWidth = .6 + rnd() * 2.4;
+    const amp = 2 + rnd() * 7, freq = .002 + rnd() * .004, ph = rnd() * 6, lean = (rnd() - .5) * 30;
+    g.beginPath();
+    for (let y = -10; y <= PH + 10; y += 15) {
+      const xx = x + Math.sin(y * freq + ph) * amp + lean * y / PH;
+      y < 0 ? g.moveTo(xx, y) : g.lineTo(xx, y);
+    }
+    g.stroke();
+  }
+  // Two faint knots
+  for (const [kx, ky, kr] of [[300, 980, 70], [820, 330, 46]]) {
+    for (let r = kr; r > 4; r -= 5 + rnd() * 4) {
+      g.strokeStyle = `rgba(30,15,6,${.10 + rnd() * .12})`; g.lineWidth = 1 + rnd() * 1.5;
+      g.beginPath(); g.ellipse(kx, ky, r * .45, r * 1.6, (rnd() - .5) * .2, 0, Math.PI * 2); g.stroke();
+    }
+  }
+  // Soft light from the top, darker edges
+  const glow = g.createRadialGradient(PW / 2, 160, 40, PW / 2, 160, 760);
+  glow.addColorStop(0, 'rgba(255,200,150,.14)'); glow.addColorStop(1, 'rgba(255,200,150,0)');
+  g.fillStyle = glow; g.fillRect(0, 0, PW, PH);
+  const vig = g.createRadialGradient(PW / 2, PH / 2, PH * .35, PW / 2, PH / 2, PH * .8);
+  vig.addColorStop(0, 'rgba(0,0,0,0)'); vig.addColorStop(1, 'rgba(10,4,0,.55)');
+  g.fillStyle = vig; g.fillRect(0, 0, PW, PH);
+  g.fillStyle = 'rgba(255,235,210,.55)'; g.fillRect(0, 0, PW, 5);
+  return c;
+}
+
+function layout(n) {
+  const cols = n <= 3 ? n : n === 4 ? 2 : 3, rows = Math.ceil(n / cols);
+  const left = 72, top = 252, areaW = PW - left * 2, areaH = 1238 - top;
+  const gapX = 34, gapY = 24;
+  let w = Math.min((areaW - (cols - 1) * gapX) / cols, 620);
+  let ts, as, labelH;
+  for (let k = 0; k < 2; k++) {
+    ts = Math.max(19, Math.min(30, w * .085)); as = ts * .86; labelH = ts * 1.35 + as * 1.3 + 10;
+    w = Math.min(w, (areaH - (rows - 1) * gapY) / rows - labelH);
+  }
+  w = Math.floor(w);
+  const totalH = rows * (w + labelH) + (rows - 1) * gapY;
+  const y0 = top + Math.max(0, (areaH - totalH) / 2);
+  const cells = [];
+  for (let ix = 0; ix < n; ix++) {
+    const r = Math.floor(ix / cols), inRow = Math.min(cols, n - r * cols), c = ix - r * cols;
+    const rowW = inRow * w + (inRow - 1) * gapX;
+    cells.push({x: Math.round((PW - rowW) / 2 + c * (w + gapX)), y: Math.round(y0 + r * (w + labelH + gapY))});
+  }
+  return {w, ts, as, cells};
+}
+
+async function drawPoster() {
+  const token = ++posterToken;
+  const canvas = $('#mxCanvas'); if (!canvas) return;
+  posterFile = null;
+  const picks = mxPicks(), n = picks.length;
+  try { await document.fonts.load(font(850, 100, 'extra-condensed')); await document.fonts.load(font(600, 24)); } catch {}
+  const covers = await Promise.all(picks.map(loadCover));
+  if (token !== posterToken) return;
+
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(wood(), 0, 0);
+  const cream = '#F5E7CF', soft = 'rgba(245,231,207,.66)';
+  ctx.textBaseline = 'alphabetic';
+
+  // Title
+  const title = n === 1 ? 'MY1ALBUM' : `MY${n}ALBUMS`;
+  let size = 128;
+  ctx.font = font(850, size, 'extra-condensed');
+  while (ctx.measureText(title).width > PW - 160 && size > 60) ctx.font = font(850, size -= 4, 'extra-condensed');
+  ctx.textAlign = 'center';
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowOffsetY = 4; ctx.shadowBlur = 10;
+  ctx.fillStyle = cream; ctx.fillText(title, PW / 2, 158);
+  ctx.restore();
+  ctx.font = font(400, 30); ctx.fillStyle = soft;
+  ctx.fillText(fit(ctx, mx.subtitle.trim() || mxDefaultSubtitle(), PW - 160), PW / 2, 210);
+
+  // Covers
+  ctx.textAlign = 'left';
+  if (!n) {
+    ctx.textAlign = 'center'; ctx.font = font(500, 30); ctx.fillStyle = soft;
+    ctx.fillText('No records match this filter.', PW / 2, PH / 2);
+  }
+  const L = layout(Math.max(n, 1));
+  let safe = true;
+  picks.forEach((it, ix) => {
+    const {x, y} = L.cells[ix], w = L.w, cv = covers[ix];
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.55)'; ctx.shadowBlur = 26; ctx.shadowOffsetY = 10;
+    ctx.fillStyle = '#2a1a10'; ctx.fillRect(x, y, w, w);
+    ctx.restore();
+    if (cv) {
+      if (!cv.safe) safe = false;
+      const {img} = cv, s = Math.min(img.naturalWidth, img.naturalHeight);
+      ctx.drawImage(img, (img.naturalWidth - s) / 2, (img.naturalHeight - s) / 2, s, s, x, y, w, w);
+    } else {
+      // No cover on Discogs: print the title on the blank sleeve
+      ctx.fillStyle = '#d9c7a8'; ctx.fillRect(x, y, w, w);
+      ctx.fillStyle = '#3a2517'; ctx.textAlign = 'center';
+      ctx.font = font(800, Math.round(w * .11), 'extra-condensed');
+      ctx.fillText(fit(ctx, it.title, w * .85), x + w / 2, y + w / 2);
+      ctx.textAlign = 'left';
+    }
+    ctx.font = font(650, L.ts); ctx.fillStyle = cream;
+    ctx.fillText(fit(ctx, it.title, w), x, y + w + L.ts * 1.3);
+    ctx.font = font(400, L.as); ctx.fillStyle = soft;
+    ctx.fillText(fit(ctx, it.artist, w), x, y + w + L.ts * 1.3 + L.as * 1.35);
+  });
+
+  // Footer
+  ctx.fillStyle = 'rgba(245,231,207,.16)'; ctx.fillRect(72, 1270, PW - 144, 1.5);
+  ctx.font = font(500, 24); ctx.fillStyle = soft; ctx.textAlign = 'left';
+  const handle = mx.handle ? (mx.handle.startsWith('@') ? mx.handle : '@' + mx.handle) : '';
+  ctx.fillText(`${(n === 1 ? 'MY1ALBUM' : `MY${n || 9}ALBUMS`).toLowerCase()}${handle ? '  by ' + handle : ''}`, 72, 1316);
+  ctx.textAlign = 'right';
+  ctx.fillText(n ? `01—${pad2(n)}` : '', PW - 72, 1316);
+
+  canvas.setAttribute('aria-label', n ? `${title}: ${picks.map(i => `${i.title} by ${i.artist}`).join('; ')}` : 'No records match this filter.');
+  posterSafe = safe && n > 0;
+  $('#drawer').querySelectorAll('[data-share],[data-download]').forEach(b => b.disabled = !n);
+  if (!n) return;
+  if (!safe) { flash('Discogs didn’t allow one of these covers to be saved from the page. Take a screenshot of the preview instead.', true); return; }
+  $('#shareMsg').textContent = '';
+  // Make the file now: iPhones only open the share sheet straight after a tap
+  canvas.toBlob(b => { if (b && token === posterToken) posterFile = new File([b], `my${n}albums.png`, {type:'image/png'}); }, 'image/png');
+}
+
+const posterCaption = () => `#my${mxPicks().length}albums`;
+async function sharePoster() {
+  if (!posterFile) return flash(posterSafe ? 'The image is still being made. Try again in a moment.' : 'This image can’t be saved. Take a screenshot of the preview instead.');
+  if (!navigator.canShare?.({files:[posterFile]})) return downloadPoster();
+  copyText(posterCaption());
+  try {
+    await navigator.share({files:[posterFile], text:posterCaption()});
+    flash('Shared. The caption is copied if you want to paste it.');
+  } catch (e) {
+    if (e.name !== 'AbortError') flash('Sharing didn’t work here. Use Download instead.');
+  }
+}
+function downloadPoster() {
+  if (!posterFile) return flash(posterSafe ? 'The image is still being made. Try again in a moment.' : 'This image can’t be saved. Take a screenshot of the preview instead.');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(posterFile); a.download = posterFile.name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  flash('Downloaded ' + posterFile.name + '.');
+}
+$('#myx').addEventListener('click', openMyX);
+
 /* ---------- Theme ---------- */
+// A saved 'halloween' (or anything else unknown) falls back to standard.
 function setTheme(theme) {
-  const on = theme === 'halloween';
-  if (on) document.documentElement.dataset.theme = 'halloween';
+  const on = theme === 'autumn';
+  if (on) document.documentElement.dataset.theme = 'autumn';
   else delete document.documentElement.dataset.theme;
   const btn = $('#themeToggle');
   btn.setAttribute('aria-pressed', on);
-  btn.title = on ? 'Switch to standard theme' : 'Switch to Halloween theme';
+  btn.title = on ? 'Switch to standard theme' : 'Switch to Autumn theme';
 }
 $('#themeToggle').addEventListener('click', () => {
-  const next = document.documentElement.dataset.theme === 'halloween' ? 'standard' : 'halloween';
+  const next = document.documentElement.dataset.theme === 'autumn' ? 'standard' : 'autumn';
   setTheme(next);
   store.set('shelf:theme', next);
 });
