@@ -1,7 +1,7 @@
 # cratedig
 a better discogs front end
 
-A fast, phone-friendly way to browse your own Discogs collection: a cover wall or list view, search, filters for genre, style, format and decade, and a quick way to check whether you already own a record while you're out digging.
+A fast, phone-friendly way to browse your own Discogs collection: a cover wall or list view, search, filters for genre, style, format and decade, a quick way to check whether you already own a record while you're out digging, and a My X albums maker that turns a random pick of up to nine records into an image you can post.
 
 It's a single static `index.html` with no build step and no server. Open the hosted page, enter your Discogs username and (optionally) a personal access token, and the app loads your collection straight from the Discogs API.
 
